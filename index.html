@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inbondz Finance | Premium Market Tracker</title>
+    <title>Inbondz Finance | Pro Market Tracker</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     
@@ -12,22 +15,17 @@
             --bg: #050505;
             --surface: #0f1216;
             --surface-hover: #1a1f26;
-            --accent: #3b82f6; /* Inbondz Blue */
+            --brand-gray: #9EA3A3; /* NEW BRAND COLOR */
+            --accent: #3b82f6;
             --green: #10b981;
             --red: #ef4444;
             --text: #ffffff;
             --text-muted: #9ca3af;
             --border: rgba(255, 255, 255, 0.08);
-            --glass: rgba(15, 18, 22, 0.85);
             --menu-width: 300px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg);
@@ -37,265 +35,144 @@
             min-height: 100vh;
         }
 
-        /* --- NAVIGATION BAR --- */
+        /* --- NAV --- */
         nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 70px;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
+            position: fixed; top: 0; left: 0; right: 0; height: 70px;
+            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
         }
-
-        .brand {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem; /* Slightly adjusted for longer name */
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: -0.5px;
+        
+        .brand { 
+            font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 700; 
+            display: flex; align-items: center; gap: 10px; color: white;
         }
         .brand i { color: var(--accent); }
 
-        /* HAMBURGER BUTTON (Gemini Animation) */
-        .menu-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1200;
-        }
-        
-        .hamburger {
-            width: 24px;
-            height: 2px;
-            background: white;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        .hamburger::before,
-        .hamburger::after {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 2px;
-            background: white;
-            transition: all 0.3s ease;
-        }
-        .hamburger::before { transform: translateY(-8px); }
-        .hamburger::after { transform: translateY(8px); }
-
-        /* Animation State */
-        .menu-open .hamburger { background: transparent; }
-        .menu-open .hamburger::before { transform: rotate(45deg); }
-        .menu-open .hamburger::after { transform: rotate(-45deg); }
-
-        /* --- SLIDE-OUT MENU --- */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: var(--menu-width);
-            height: 100vh;
-            background: var(--surface);
-            border-left: 1px solid var(--border);
-            transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
-            z-index: 1100;
-            display: flex;
+        /* --- 3-LINE MENU BUTTON (SIMPLE) --- */
+        .menu-btn { 
+            background: none; 
+            border: none; 
+            width: 40px; 
+            height: 40px; 
+            z-index: 1200; 
+            cursor: pointer; 
+            display: flex; 
             flex-direction: column;
-            padding-top: 100px;
-            padding-left: 40px;
+            justify-content: center;
+            align-items: center;
+            gap: 6px; /* Gap between lines */
         }
 
-        .side-menu.active {
-            transform: translateX(0);
-            box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+        /* The 3 Lines */
+        .line {
+            width: 28px;
+            height: 2px;
+            background-color: var(--brand-gray); /* #9EA3A3 */
+            border-radius: 2px;
+            transition: all 0.3s ease;
         }
 
-        .menu-link {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.8rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            margin-bottom: 25px;
-            transition: 0.3s;
-            position: relative;
-            display: inline-block;
-            font-weight: 700;
+        /* --- MENU DRAWER --- */
+        .side-menu {
+            position: fixed; top: 0; right: 0; width: var(--menu-width); height: 100vh;
+            background: var(--surface); border-left: 1px solid var(--border);
+            transform: translateX(100%); transition: 0.4s cubic-bezier(0.77,0,0.175,1);
+            z-index: 1100; padding: 100px 0 0 40px; display: flex; flex-direction: column;
         }
-
-        .menu-link:hover, .menu-link.active {
-            color: white;
-            transform: translateX(10px);
-        }
+        .side-menu.active { transform: translateX(0); box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
         
-        .menu-link.active::before {
-            content: '';
-            position: absolute;
-            left: -20px; top: 50%;
-            width: 8px; height: 8px;
-            background: var(--accent);
-            border-radius: 50%;
-            transform: translateY(-50%);
+        .menu-link { 
+            font-family: 'Space Grotesk'; font-size: 1.8rem; 
+            color: var(--brand-gray); /* #9EA3A3 */
+            text-decoration: none; margin-bottom: 25px; 
+            font-weight: 700; transition: 0.3s; 
         }
-
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s;
-            z-index: 1050;
-        }
+        .menu-link:hover, .menu-link.active { color: white; transform: translateX(10px); }
+        
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1050; }
         .overlay.active { opacity: 1; pointer-events: all; }
 
-        /* --- PAGE CONTENT --- */
-        .page-section {
-            display: none;
-            padding: 100px 20px 40px;
-            max-width: 1000px;
-            margin: 0 auto;
-            animation: fadeIn 0.5s ease;
-        }
+        /* --- PAGE SECTIONS --- */
+        .page-section { display: none; padding: 100px 20px 40px; max-width: 800px; margin: 0 auto; animation: fadeIn 0.5s ease; }
         .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- MARKET TABLE --- */
-        .market-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+        /* --- HOME --- */
+        .market-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         .market-title h1 { font-family: 'Space Grotesk'; font-size: 2rem; }
         .market-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
-
-        #searchInput {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 12px 20px;
-            border-radius: 50px;
-            color: white;
-            outline: none;
-            width: 100%;
-            max-width: 250px;
-        }
-
-        .crypto-grid {
-            display: grid;
-            gap: 15px;
-        }
-
+        #searchInput { background: var(--surface); border: 1px solid var(--border); padding: 12px 20px; border-radius: 50px; color: white; outline: none; width: 100%; max-width: 200px; }
+        
+        .crypto-grid { display: grid; gap: 15px; }
         .coin-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: 0.3s;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+            display: flex; align-items: center; justify-content: space-between; transition: 0.3s; cursor: pointer;
         }
-        .coin-card:hover {
-            background: var(--surface-hover);
-            transform: translateY(-2px);
-            border-color: rgba(255,255,255,0.2);
-        }
-
+        .coin-card:hover { background: var(--surface-hover); transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }
+        
         .coin-left { display: flex; align-items: center; gap: 15px; }
         .coin-img { width: 40px; height: 40px; border-radius: 50%; }
         .coin-name { font-weight: 700; font-size: 1.1rem; }
         .coin-symbol { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
-
         .coin-right { text-align: right; }
         .price { font-weight: 700; font-size: 1.1rem; }
         .change { font-size: 0.9rem; font-weight: 600; margin-top: 2px; }
-        .up { color: var(--green); }
-        .down { color: var(--red); }
+        .up { color: var(--green); } .down { color: var(--red); }
+
+        /* --- CHART MODAL --- */
+        .modal-wrap {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .chart-card {
+            background: #111418; width: 100%; max-width: 500px; border-radius: 24px; border: 1px solid var(--border);
+            padding: 30px; position: relative; animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .close-modal { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
+        
+        .chart-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .chart-header img { width: 50px; height: 50px; border-radius: 50%; }
+        .chart-price-box h2 { font-family: 'Space Grotesk'; font-size: 1.5rem; margin-bottom: 5px; }
+        .chart-price-box .big-price { font-size: 1.8rem; font-weight: 800; }
+
+        .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px; }
 
         /* --- AD SPOTS --- */
-        .ad-container {
-            width: 100%;
-            background: rgba(255,255,255,0.02);
-            border: 1px dashed var(--border);
-            padding: 20px;
-            text-align: center;
-            color: #444;
-            margin-bottom: 30px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .ad-container { width: 100%; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); padding: 15px; text-align: center; color: #444; border-radius: 12px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
 
-        /* --- LEGAL & CONTACT --- */
-        .legal-content h2 { font-family: 'Space Grotesk'; font-size: 2rem; margin-bottom: 20px; color: var(--accent); }
-        .legal-content h3 { font-size: 1.2rem; margin: 25px 0 10px; color: white; }
-        .legal-content p { line-height: 1.6; color: var(--text-muted); margin-bottom: 15px; }
-
-        .contact-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 40px;
-            border-radius: 24px;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .profile-bubble {
+        /* --- CONTACT & LEGAL --- */
+        .contact-card { background: var(--surface); border: 1px solid var(--border); padding: 40px; border-radius: 24px; text-align: center; margin-top: 20px; }
+        .contact-link { display: inline-flex; align-items: center; gap: 10px; background: white; color: black; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; margin-top: 20px; transition: 0.3s; }
+        .contact-link:hover { transform: scale(1.05); background: var(--accent); color: white; }
+        .legal-content h2 { color: var(--accent); margin-bottom: 20px; font-family: 'Space Grotesk'; }
+        .legal-content p { color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
+        
+        /* Profile Image for Contact */
+        .profile-bubble-img {
             width: 80px; height: 80px;
-            background: linear-gradient(135deg, var(--accent), #60a5fa);
             border-radius: 50%;
             margin: 0 auto 20px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; color: white;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            padding: 2px;
+            background: var(--surface);
         }
-        .contact-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            color: black;
-            padding: 15px 30px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            margin-top: 20px;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .contact-link:hover { transform: scale(1.05); background: var(--accent); color: white; }
 
-        .loader {
-            text-align: center; margin-top: 50px; color: var(--text-muted);
-        }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="brand">
-            <i class="fa-solid fa-chart-line"></i> Inbondz Finance
-        </div>
+        <div class="brand"><i class="fa-solid fa-chart-line"></i> Inbondz Finance</div>
         <button class="menu-btn" onclick="toggleMenu()" id="menuBtn">
-            <div class="hamburger"></div>
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
         </button>
     </nav>
 
@@ -308,102 +185,81 @@
     </div>
 
     <section id="home" class="page-section active">
-        <div class="ad-container">Google AdSense Banner (Responsive)</div>
-
+        <div class="ad-container">AdSense Banner (Responsive)</div>
         <div class="market-header">
-            <div class="market-title">
-                <h1>Live Market</h1>
-                <p>Global Crypto Data</p>
-            </div>
-            <input type="text" id="searchInput" placeholder="Search Assets...">
+            <div class="market-title"><h1>Live Market</h1><p>Global Crypto Data</p></div>
+            <input type="text" id="searchInput" placeholder="Search...">
         </div>
-
         <div id="cryptoList" class="crypto-grid">
-            <div class="loader"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Inbondz Data...</div>
+            <div style="text-align: center; color: #888; margin-top: 50px;"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading...</div>
         </div>
     </section>
 
+    <div class="modal-wrap" id="chartModal">
+        <div class="chart-card">
+            <button class="close-modal" onclick="closeChart()">&times;</button>
+            
+            <div class="chart-header">
+                <img src="" id="cImg">
+                <div class="chart-price-box">
+                    <h2 id="cName">Bitcoin</h2>
+                    <div class="big-price" id="cPrice">$0.00</div>
+                    <div id="cChange" style="font-weight: 600;">0.00%</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="coinGraph"></canvas>
+            </div>
+
+            <div class="ad-container" style="margin-bottom: 0;">AdSense Square (300x250)</div>
+        </div>
+    </div>
+
     <section id="terms" class="page-section legal-content">
         <h2>Terms of Service</h2>
-        <p>Last Updated: January 2026</p>
-        <div class="ad-container">Google AdSense In-Article</div>
-        
-        <h3>1. Acceptance of Terms</h3>
-        <p>By accessing and using Inbondz Finance, you accept and agree to be bound by the terms and provision of this agreement.</p>
-        
-        <h3>2. Data Accuracy</h3>
-        <p>Inbondz Finance provides financial data for informational purposes only. We do not guarantee the accuracy, completeness, or timeliness of any data provided. This is not financial advice.</p>
-        
-        <h3>3. User Conduct</h3>
-        <p>Users agree not to use the website for any unlawful purpose or any purpose prohibited under this clause. You agree not to use the website in any way that could damage the general business of Inbondz Finance.</p>
+        <p>By accessing Inbondz Finance, you agree to our terms. Data is for informational purposes only. Last Updated: 2026.</p>
+        <div class="ad-container">AdSense In-Article</div>
     </section>
 
     <section id="privacy" class="page-section legal-content">
         <h2>Privacy Policy</h2>
-        <div class="ad-container">Google AdSense In-Article</div>
-        
-        <h3>1. Information Collection</h3>
-        <p>We do not collect personal data from our users. We use third-party services like Google AdSense which may use cookies to serve ads based on prior visits.</p>
-        
-        <h3>2. Third Party Links</h3>
-        <p>Inbondz Finance may contain links to other websites. We are not responsible for the privacy practices of other sites.</p>
-        
-        <h3>3. Changes to This Policy</h3>
-        <p>We reserve the right to modify this privacy policy at any time, so please review it frequently.</p>
+        <p>We respect your privacy. We do not collect personal data. Cookies may be used by third-party ad networks.</p>
+        <div class="ad-container">AdSense In-Article</div>
     </section>
 
     <section id="contact" class="page-section">
-        <h2>Get in Touch</h2>
-        <p style="text-align: center; color: #888; margin-bottom: 40px;">Have partnership inquiries? Reach out directly.</p>
-        
+        <h2>Contact</h2>
         <div class="contact-card">
-            <div class="profile-bubble"><i class="fa-solid fa-user-astronaut"></i></div>
-            <h3>Sk Wasim</h3>
-            <p style="margin-top: 10px;">Co-Founder & Lead Architect</p>
+            <img src="https://unavatar.io/twitter/skwasimx" alt="Sk Wasim" class="profile-bubble-img" onerror="this.src='https://ui-avatars.com/api/?name=Sk+Wasim&background=3b82f6&color=fff'">
             
-            <a href="https://wasim.inbondz.com" target="_blank" class="contact-link">
-                Visit Profile <i class="fa-solid fa-arrow-right"></i>
-            </a>
+            <h3>Sk Wasim</h3>
+            <p style="color: #999; margin-top: 5px;">Co-Founder & Lead Architect</p>
+            <a href="https://wasim.inbondz.com" target="_blank" class="contact-link">Visit Profile <i class="fa-solid fa-arrow-right"></i></a>
         </div>
-        
-        <div class="ad-container" style="margin-top: 40px;">Google AdSense Square</div>
+        <div class="ad-container" style="margin-top: 20px;">AdSense Square</div>
     </section>
 
     <script>
-        // --- ROUTING LOGIC ---
-        function navTo(pageId) {
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            
-            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
-
-            toggleMenu();
-            window.scrollTo(0, 0);
-        }
-
-        // --- MENU TOGGLE ---
+        // --- NAVIGATION ---
         function toggleMenu() {
-            const menuBtn = document.getElementById('menuBtn');
-            const sideMenu = document.getElementById('sideMenu');
-            const overlay = document.getElementById('overlay');
-
-            if (sideMenu.classList.contains('active')) {
-                sideMenu.classList.remove('active');
-                overlay.classList.remove('active');
-                menuBtn.classList.remove('menu-open');
-            } else {
-                sideMenu.classList.add('active');
-                overlay.classList.add('active');
-                menuBtn.classList.add('menu-open');
-            }
+            document.getElementById('sideMenu').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+        function navTo(id) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+            event.target.classList.add('active');
+            toggleMenu(); window.scrollTo(0,0);
         }
 
-        // --- CRYPTO API LOGIC ---
-        const apiURL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false';
+        // --- CRYPTO LOGIC ---
+        const apiURL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true';
         const listContainer = document.getElementById('cryptoList');
         const searchInput = document.getElementById('searchInput');
         let allCoins = [];
+        let myChart = null; 
 
         async function fetchCrypto() {
             try {
@@ -411,9 +267,7 @@
                 const data = await res.json();
                 allCoins = data;
                 renderCoins(data);
-            } catch (err) {
-                console.log(err);
-            }
+            } catch (err) { console.log("API Error", err); }
         }
 
         function renderCoins(coins) {
@@ -423,35 +277,77 @@
                 const changeClass = isUp ? 'up' : 'down';
                 const plus = isUp ? '+' : '';
                 
-                const card = document.createElement('div');
-                card.className = 'coin-card';
-                card.innerHTML = `
+                const div = document.createElement('div');
+                div.className = 'coin-card';
+                div.innerHTML = `
                     <div class="coin-left">
-                        <img src="${coin.image}" class="coin-img" alt="${coin.symbol}">
-                        <div>
-                            <div class="coin-name">${coin.name}</div>
-                            <div class="coin-symbol">${coin.symbol}</div>
-                        </div>
+                        <img src="${coin.image}" class="coin-img">
+                        <div><div class="coin-name">${coin.name}</div><div class="coin-symbol">${coin.symbol}</div></div>
                     </div>
                     <div class="coin-right">
                         <div class="price">$${coin.current_price.toLocaleString()}</div>
                         <div class="change ${changeClass}">${plus}${coin.price_change_percentage_24h.toFixed(2)}%</div>
                     </div>
                 `;
-                listContainer.appendChild(card);
+                div.onclick = () => openChart(coin);
+                listContainer.appendChild(div);
             });
         }
 
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            const filtered = allCoins.filter(c => 
-                c.name.toLowerCase().includes(term) || 
-                c.symbol.toLowerCase().includes(term)
-            );
-            renderCoins(filtered);
+            renderCoins(allCoins.filter(c => c.name.toLowerCase().includes(term) || c.symbol.toLowerCase().includes(term)));
         });
 
-        // Initialize
+        // --- CHART LOGIC ---
+        function openChart(coin) {
+            const modal = document.getElementById('chartModal');
+            const isUp = coin.price_change_percentage_24h >= 0;
+            const color = isUp ? '#10b981' : '#ef4444'; 
+
+            document.getElementById('cImg').src = coin.image;
+            document.getElementById('cName').innerText = coin.name;
+            document.getElementById('cPrice').innerText = '$' + coin.current_price.toLocaleString();
+            document.getElementById('cChange').innerText = `${isUp ? '+' : ''}${coin.price_change_percentage_24h.toFixed(2)}% (24h)`;
+            document.getElementById('cChange').style.color = color;
+
+            const ctx = document.getElementById('coinGraph').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            let gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, isUp ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(coin.sparkline_in_7d.price.length).fill(''),
+                    datasets: [{
+                        label: 'Price',
+                        data: coin.sparkline_in_7d.price,
+                        borderColor: color,
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0.4 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                    scales: { x: { display: false }, y: { display: false } },
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                }
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function closeChart() { document.getElementById('chartModal').style.display = 'none'; }
+        document.getElementById('chartModal').addEventListener('click', (e) => { if (e.target.id === 'chartModal') closeChart(); });
+
         fetchCrypto();
         setInterval(fetchCrypto, 60000);
     </script>
